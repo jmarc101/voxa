@@ -1,0 +1,73 @@
+# -----------------
+# Python cache / build
+# -----------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pkl
+*.so
+
+# Byte-compiled / optimized / DLL files
+*.pyc
+*.pyd
+*.pyo
+
+# C extensions
+*.so
+
+# Distribution / packaging
+build/
+dist/
+eggs/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# -----------------
+# Virtual envs
+# -----------------
+.venv/
+venv/
+env/
+ENV/
+
+# -----------------
+# Test / coverage
+# -----------------
+.coverage
+coverage.xml
+htmlcov/
+pytest_cache/
+
+# -----------------
+# IDE / editor
+# -----------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# -----------------
+# Logs / temp
+# -----------------
+*.log
+*.tmp
+tmp/
+temp/
+*.bak
+
+# -----------------
+# Generated assets
+# -----------------
+assets/generated/
+
+# -----------------
+# OS generated files
+# -----------------
+.DS_Store
+Thumbs.db
