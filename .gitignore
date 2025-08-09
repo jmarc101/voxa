@@ -1,4 +1,17 @@
 # -----------------
+# Go
+# -----------------
+bin/
+.env
+.env.local
+.env.production
+
+# -----------------
+# Protobuf
+# -----------------
+api/gen/
+
+# -----------------
 # Python cache / build
 # -----------------
 __pycache__/
