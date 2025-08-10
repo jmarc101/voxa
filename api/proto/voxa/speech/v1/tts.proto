@@ -1,0 +1,36 @@
+syntax = "proto3";
+package voxa.speech.v1;
+
+import "voxa/speech/v1/audio.proto";
+
+option go_package = "github.com/jmarc101/voxa/api/gen/voxa/speech/v1;speechv1";
+
+// TTS is the text-to-speech service definition.
+service TTS {
+  // Server-streaming: returns audio chunks for the given request.
+  rpc SynthesizeStream(SynthesizeRequest) returns (stream SynthesizeResponse);
+  // Unary fallback for REST/HTTP clients (returns one chunk, e.g., full WAV/Opus).
+  rpc Synthesize(SynthesizeRequest) returns (SynthesizeResponse);
+}
+
+// SynthesizeRequest contains the parameters for generating audio from text.
+message SynthesizeRequest {
+  // The text to synthesize into speech.
+  string text = 1;
+  // The voice identifier (e.g., "en_US-amy-low").
+  string voice = 2;
+  // The desired output audio format.
+  AudioFormat format = 3;
+  // The output audio sample rate in Hertz (e.g., 16000).
+  int32 sample_rate_hz = 4;
+}
+
+// SynthesizeAudioChunk represents a chunk of synthesized audio data.
+message SynthesizeResponse {
+  // The audio frame bytes and metadata.
+  AudioFrame frame = 1;
+  // True if this is the final chunk in the stream.
+  bool is_final = 2;
+}
+
+

@@ -1,0 +1,6 @@
+{
+  "extraPaths": ["api/gen"],
+  "executionEnvironments": [
+    { "root": "services/asr" }
+  ]
+}

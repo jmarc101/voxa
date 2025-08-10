@@ -1,0 +1,4 @@
+grpcio>=1.74
+protobuf>=6.31
+faster-whisper>=1.2
+numpy>=1.26
