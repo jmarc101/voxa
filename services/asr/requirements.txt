@@ -1,4 +1,4 @@
-grpcio>=1.74
-protobuf>=6.31
-faster-whisper>=1.2
-numpy>=1.26
+grpcio>=1.74,<2
+protobuf>=6.31,<7
+faster-whisper>=1.2,<2
+numpy>=1.26,<3

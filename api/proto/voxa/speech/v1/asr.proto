@@ -4,6 +4,7 @@ package voxa.speech.v1;
 
 import "voxa/speech/v1/audio.proto";
 import "google/protobuf/timestamp.proto";
+import "third_party/googleapis/google/api/annotations.proto";
 
 option go_package = "github.com/jmarc101/voxa/api/gen/voxa/speech/v1;speechv1";
 
@@ -14,7 +15,12 @@ service ASR {
   // The client streams audio frames; the server streams transcript updates.
   rpc StreamingRecognize(stream StreamingRecognizeRequest) returns (stream StreamingRecognizeResponse);
   // Recognize performs non-streaming recognition for REST/HTTP clients.
-  rpc Recognize(RecognizeRequest) returns (RecognizeResponse);
+  rpc Recognize(RecognizeRequest) returns (RecognizeResponse){
+    option (google.api.http) = {
+      post: "/v1/asr:recognize"
+      body: "*"
+    };
+  }
 }
 
 // StreamingRecognizeRequest carries one chunk of input audio.

@@ -2,6 +2,7 @@ syntax = "proto3";
 package voxa.speech.v1;
 
 import "voxa/speech/v1/audio.proto";
+import "third_party/googleapis/google/api/annotations.proto";
 
 option go_package = "github.com/jmarc101/voxa/api/gen/voxa/speech/v1;speechv1";
 
@@ -10,7 +11,12 @@ service TTS {
   // Server-streaming: returns audio chunks for the given request.
   rpc SynthesizeStream(SynthesizeRequest) returns (stream SynthesizeResponse);
   // Unary fallback for REST/HTTP clients (returns one chunk, e.g., full WAV/Opus).
-  rpc Synthesize(SynthesizeRequest) returns (SynthesizeResponse);
+  rpc Synthesize(SynthesizeRequest) returns (SynthesizeResponse){
+    option (google.api.http) = {
+      post: "/v1/tts:synthesize"
+      body: "*"
+    };
+  }
 }
 
 // SynthesizeRequest contains the parameters for generating audio from text.
@@ -25,7 +31,7 @@ message SynthesizeRequest {
   int32 sample_rate_hz = 4;
 }
 
-// SynthesizeAudioChunk represents a chunk of synthesized audio data.
+// SynthesizeResponse contains a chunk of synthesized audio data.
 message SynthesizeResponse {
   // The audio frame bytes and metadata.
   AudioFrame frame = 1;
