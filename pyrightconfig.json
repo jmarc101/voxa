@@ -1,5 +1,8 @@
 {
-  "extraPaths": ["api/gen"],
+  "extraPaths": [
+    "api/gen",
+    "third_party/googleapis"
+  ],
   "executionEnvironments": [
     { "root": "services/asr" }
   ]

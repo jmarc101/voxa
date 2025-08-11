@@ -19,14 +19,14 @@ run:
 # PYTHON BUILD TARGETS
 # ----------------------------------
 
-.PHONY: build-asr build-tts
+.PHONY: build-asr build-tts clean-asr clean-tts
 
 ASR_DIR := services/asr
 ASR_VENV := $(ASR_DIR)/.venv
 ASR_PY := $(ASR_VENV)/bin/python
 
 build-asr:
-	python3 -m venv $(ASR_VENV)
+	@test -x "$(ASR_PY)" || python3 -m venv $(ASR_VENV)
 	$(ASR_PY) -m pip install -U pip
 	$(ASR_PY) -m pip install -r $(ASR_DIR)/requirements.txt
 
@@ -34,10 +34,18 @@ build-asr-dev: build-asr
 	$(ASR_PY) -m pip install -r $(ASR_DIR)/requirements-dev.txt
 
 build-tts:
-	cd services/tts && \
-	python3 -m venv .venv && \
-	source .venv/bin/activate && \
-	python -m pip install -r requirements.txt
+	@test -x "$(TTS_PY)" || python3 -m venv $(TTS_VENV)
+	$(TTS_PY) -m pip install -U pip
+	$(TTS_PY) -m pip install -r $(TTS_DIR)/requirements.txt
+
+build-tts-dev: build-tts
+	$(TTS_PY) -m pip install -r $(TTS_DIR)/requirements-dev.txt
+
+clean-asr:
+	rm -rf $(ASR_VENV)
+
+clean-tts:
+	rm -rf $(TTS_VENV)
 
 # ----------------------------------
 # BUF GENERATE TARGETS
@@ -71,7 +79,7 @@ gen-py: proto-venv
 		-I $(PROTO_DIR) -I $(GOOGLEAPIS_DIR) \
 		--python_out=$(OUT_DIR) \
 		--grpc_python_out=$(OUT_DIR) \
-		--plugin=protoc-gen-mypy=$(MYPY_PLUGIN)/bin/protoc-gen-mypy \
+		--plugin=protoc-gen-mypy=$(VENV_DIR)/bin/protoc-gen-mypy \
 		--mypy_out=$(OUT_DIR) \
 		$(PROTOS)
 

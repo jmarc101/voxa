@@ -4,9 +4,13 @@ package voxa.speech.v1;
 
 import "voxa/speech/v1/audio.proto";
 import "google/protobuf/timestamp.proto";
-import "third_party/googleapis/google/api/annotations.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
 
 option go_package = "github.com/jmarc101/voxa/api/gen/voxa/speech/v1;speechv1";
+option java_package = "com.voxa.speech.v1";
+option java_multiple_files = true;
+option java_outer_classname = "ASRProto";
 
 // ASR is the automatic speech recognition service definition.
 // It provides streaming and batch speech recognition.
@@ -42,9 +46,11 @@ message StreamingRecognizeResponse {
 // RecognizeRequest is the unary request for non-streaming recognition.
 message RecognizeRequest {
   // The ordered audio frames forming the full utterance.
-  repeated AudioFrame frames = 1;
-  // The capture time (UTC) of the first sample in the first frame.
-  google.protobuf.Timestamp first_frame_time = 2;
+  repeated AudioFrame frames = 1 [(google.api.field_behavior) = REQUIRED];
+  // (Optional: Defaults to 16000) Sample rate in Hz
+  int32 sample_rate_hz = 2 [(google.api.field_behavior) = OPTIONAL];
+  // (Optional) The capture time (UTC) of the first sample in the first frame.
+  google.protobuf.Timestamp first_frame_time = 3 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // RecognizeResponse is the unary response for non-streaming recognition.
