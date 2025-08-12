@@ -1,6 +1,8 @@
 syntax = "proto3";
 package voxa.speech.v1;
 
+import "google/api/field_behavior.proto";
+
 option go_package = "github.com/jmarc101/voxa/api/gen/voxa/speech/v1;speechv1";
 option java_package = "com.voxa.speech.v1";
 option java_multiple_files = true;
@@ -9,11 +11,11 @@ option java_outer_classname = "AudioProto";
 // AudioFrame carries a single ordered chunk of audio bytes.
 message AudioFrame {
   // The encoding of the audio data (e.g., PCM16 or OPUS).
-  AudioFormat format = 1;
+  AudioFormat format = 1 [(google.api.field_behavior) = REQUIRED];
   // The audio bytes. For PCM16, little-endian, mono. For OPUS, a single Opus packet.
-  bytes data = 2;
+  bytes data = 2 [(google.api.field_behavior) = REQUIRED];
   // A monotonically increasing sequence number for this stream (starts at 1).
-  int64 sequence = 3;
+  int64 sequence = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
 // AudioFormat specifies the encoding of the synthesized audio.

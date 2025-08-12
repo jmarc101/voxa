@@ -1,5 +1,5 @@
 import argparse
-from services.asr.engine import AsrEngine
+from .engines.whisper_engine import AsrEngine
 
 
 def main() -> int:

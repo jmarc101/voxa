@@ -30,17 +30,17 @@ service ASR {
 // StreamingRecognizeRequest carries one chunk of input audio.
 message StreamingRecognizeRequest {
   // The audio frame bytes and metadata (format, data, sequence, rate, channels).
-  AudioFrame frame = 1;
+  AudioFrame frame = 1 [(google.api.field_behavior) = REQUIRED];
   // The capture time (UTC) of the first sample in this frame.
-  google.protobuf.Timestamp first_frame_time = 2;
+  google.protobuf.Timestamp first_frame_time = 2 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // StreamingRecognizeResponse returns an incremental transcript update.
 message StreamingRecognizeResponse {
   // The recognized text for this update (partial or final).
-  string text = 1;
+  string text = 1 [(google.api.field_behavior) = REQUIRED];
   // True if this update finalizes the current segment or utterance.
-  bool is_final = 2;
+  bool is_final = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // RecognizeRequest is the unary request for non-streaming recognition.
@@ -48,7 +48,7 @@ message RecognizeRequest {
   // The ordered audio frames forming the full utterance.
   repeated AudioFrame frames = 1 [(google.api.field_behavior) = REQUIRED];
   // (Optional: Defaults to 16000) Sample rate in Hz
-  int32 sample_rate_hz = 2 [(google.api.field_behavior) = OPTIONAL];
+  int32 sample_rate_hz = 2 [(google.api.field_behavior) = REQUIRED];
   // (Optional) The capture time (UTC) of the first sample in the first frame.
   google.protobuf.Timestamp first_frame_time = 3 [(google.api.field_behavior) = OPTIONAL];
 }
@@ -56,15 +56,15 @@ message RecognizeRequest {
 // RecognizeResponse is the unary response for non-streaming recognition.
 message RecognizeResponse {
   // The full transcript text for the utterance.
-  string transcript = 1;
+  string transcript = 1 [(google.api.field_behavior) = REQUIRED];
   // The tokens that compose the transcript, including final markers if provided.
-  repeated Token tokens = 2;
+  repeated Token tokens = 2 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // Token represents a partial or final transcript update.
 message Token {
   // The recognized text for this update.
-  string text = 1;
+  string text = 1 [(google.api.field_behavior) = REQUIRED];
   // True if this update finalizes the current segment or utterance.
-  bool is_final = 2;
+  bool is_final = 2 [(google.api.field_behavior) = REQUIRED];
 }
