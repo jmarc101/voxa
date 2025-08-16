@@ -3,68 +3,107 @@ syntax = "proto3";
 package voxa.speech.v1;
 
 import "voxa/speech/v1/audio.proto";
-import "google/protobuf/timestamp.proto";
-import "google/api/annotations.proto";
-import "google/api/field_behavior.proto";
 
 option go_package = "github.com/jmarc101/voxa/api/gen/voxa/speech/v1;speechv1";
 option java_package = "com.voxa.speech.v1";
 option java_multiple_files = true;
-option java_outer_classname = "ASRProto";
+option java_outer_classname = "AsrProto";
 
-// ASR is the automatic speech recognition service definition.
-// It provides streaming and batch speech recognition.
-service ASR {
-  // StreamingRecognize performs bidirectional streaming recognition.
-  // The client streams audio frames; the server streams transcript updates.
+
+// Ultra-minimal PoC: bi‑di streaming ASR with only audio chunks and basic control.
+// Assumptions: PCM16, mono, fixed sample rate known to both sides out of band.
+service Asr {
+  // StreamingRecognize is a streaming RPC that allows the client to send audio chunks and receive transcripts.
   rpc StreamingRecognize(stream StreamingRecognizeRequest) returns (stream StreamingRecognizeResponse);
-  // Recognize performs non-streaming recognition for REST/HTTP clients.
-  rpc Recognize(RecognizeRequest) returns (RecognizeResponse){
-    option (google.api.http) = {
-      post: "/v1/asr:recognize"
-      body: "*"
-    };
+}
+
+
+// ========================= Requests =========================
+message StreamingRecognizeRequest {
+  // Utterance ID.
+  string utterance_id = 1;
+  oneof payload {
+    // Control messages
+    ASRControl control = 10;
+    // Audio chunks
+    AudioChunk audio = 11;
   }
 }
 
-// StreamingRecognizeRequest carries one chunk of input audio.
-message StreamingRecognizeRequest {
-  // The audio frame bytes and metadata (format, data, sequence, rate, channels).
-  AudioFrame frame = 1 [(google.api.field_behavior) = REQUIRED];
-  // The capture time (UTC) of the first sample in this frame.
-  google.protobuf.Timestamp first_frame_time = 2 [(google.api.field_behavior) = OPTIONAL];
+// ASRControl is a control message for the ASR engine.
+message ASRControl {
+  // The type of control message.
+  ControlType type = 1;
 }
 
-// StreamingRecognizeResponse returns an incremental transcript update.
+
+// ========================= Responses =========================
 message StreamingRecognizeResponse {
-  // The recognized text for this update (partial or final).
-  string text = 1 [(google.api.field_behavior) = REQUIRED];
-  // True if this update finalizes the current segment or utterance.
-  bool is_final = 2 [(google.api.field_behavior) = REQUIRED];
+  // The utterance ID.
+  string utterance_id = 1;
+  // The type of response.
+  ResponseType type = 2;
+
+  oneof result {
+    // The partial transcript.
+    Transcript partial_transcript = 10;
+    // The final transcript.
+    Transcript final_transcript = 11;
+    // The control acknowledgment.
+    ControlAck control_ack = 12;
+    // The error.
+    AsrError error = 13;
+  }
 }
 
-// RecognizeRequest is the unary request for non-streaming recognition.
-message RecognizeRequest {
-  // The ordered audio frames forming the full utterance.
-  repeated AudioFrame frames = 1 [(google.api.field_behavior) = REQUIRED];
-  // (Optional: Defaults to 16000) Sample rate in Hz
-  int32 sample_rate_hz = 2 [(google.api.field_behavior) = REQUIRED];
-  // (Optional) The capture time (UTC) of the first sample in the first frame.
-  google.protobuf.Timestamp first_frame_time = 3 [(google.api.field_behavior) = OPTIONAL];
+
+// Transcript is a transcript of the audio.
+message Transcript {
+  // The recognized text.
+  string text = 1;
 }
 
-// RecognizeResponse is the unary response for non-streaming recognition.
-message RecognizeResponse {
-  // The full transcript text for the utterance.
-  string transcript = 1 [(google.api.field_behavior) = REQUIRED];
-  // The tokens that compose the transcript, including final markers if provided.
-  repeated Token tokens = 2 [(google.api.field_behavior) = OPTIONAL];
+// ControlAck is an acknowledgment of a control message.
+message ControlAck {
+  // The type of control message.
+  ControlType type = 1;
+  // The message.
+  string message = 2;
 }
 
-// Token represents a partial or final transcript update.
-message Token {
-  // The recognized text for this update.
-  string text = 1 [(google.api.field_behavior) = REQUIRED];
-  // True if this update finalizes the current segment or utterance.
-  bool is_final = 2 [(google.api.field_behavior) = REQUIRED];
+// AsrError is an error response.
+// Map to gRPC status codes where possible.
+message AsrError {
+  // The error code.
+  int32 code = 1;
+  // The error message.
+  string message = 2;
+  // The error details.
+  string details = 3;
+}
+
+// ControlType is the type of control message.
+enum ControlType {
+  // The control type is unspecified.
+  CONTROL_TYPE_UNSPECIFIED = 0;
+  // FLUSH: Forces finalize the transcript buffer.
+  FLUSH = 1;
+  // RESET: Clear the current transcript and start a new one.
+  RESET = 2;
+  // END: Forces finalize and to close the stream.
+  END = 3;
+}
+
+// ResponseType is the type of response.
+enum ResponseType {
+  // The response type is unspecified.
+  RESPONSE_TYPE_UNSPECIFIED = 0;
+  // The partial transcript.
+  PARTIAL = 1;
+  // The final transcript.
+  FINAL = 2;
+  // The control acknowledgment.
+  CONTROL_ACK = 3;
+  // The error.
+  ERROR = 4;
 }

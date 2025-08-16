@@ -1,45 +1,28 @@
 syntax = "proto3";
+
 package voxa.speech.v1;
 
 import "voxa/speech/v1/audio.proto";
-import "google/api/annotations.proto";
 
 option go_package = "github.com/jmarc101/voxa/api/gen/voxa/speech/v1;speechv1";
 option java_package = "com.voxa.speech.v1";
 option java_multiple_files = true;
 option java_outer_classname = "TtsProto";
 
-// TTS is the text-to-speech service definition.
-service TTS {
-  // Server-streaming: returns audio chunks for the given request.
-  rpc StreamingSynthesize(SynthesizeRequest) returns (stream SynthesizeResponse);
-  // Unary fallback for REST/HTTP clients (returns one chunk, e.g., full WAV/Opus).
-  rpc Synthesize(SynthesizeRequest) returns (SynthesizeResponse){
-    option (google.api.http) = {
-      post: "/v1/tts:synthesize"
-      body: "*"
-    };
-  }
+// Text-to-speech service.
+// Assumptions: PCM16, mono, fixed sample rate known out of band.
+service Tts {
+  // Synthesize: stream audio chunks as soon as they are synthesized.
+  rpc Synthesize(SynthesisRequest) returns (stream AudioChunk);
+  // SynthesizeUnary: returns the whole audio buffer.
+  rpc SynthesizeUnary(SynthesisRequest) returns (AudioData);
 }
 
-// SynthesizeRequest contains the parameters for generating audio from text.
-message SynthesizeRequest {
-  // The text to synthesize into speech.
-  string text = 1;
-  // The voice identifier (e.g., "en_US-amy-low").
-  string voice = 2;
-  // The desired output audio format.
-  AudioFormat format = 3;
-  // The output audio sample rate in Hertz (e.g., 16000).
-  int32 sample_rate_hz = 4;
+// SynthesisRequest is a request to synthesize text.
+message SynthesisRequest {
+  // Utterance ID for correlating logs/playback.
+  string utterance_id = 1;
+  // Text to synthesize (plain text for PoC; SSML/voice params can be added later).
+  string text = 2;
 }
-
-// SynthesizeResponse contains a chunk of synthesized audio data.
-message SynthesizeResponse {
-  // The audio frame bytes and metadata.
-  AudioFrame frame = 1;
-  // True if this is the final chunk in the stream.
-  bool is_final = 2;
-}
-
 
