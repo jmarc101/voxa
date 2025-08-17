@@ -1,1 +1,2 @@
 types-protobuf<6.30      # fixes the DESCRIPTOR override warning with generated .pyi
+pytest

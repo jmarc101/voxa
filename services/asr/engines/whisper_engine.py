@@ -1,3 +1,4 @@
+"""ASR engine using Whisper model."""
 import math
 from faster_whisper import WhisperModel
 
@@ -5,15 +6,27 @@ DEFAULT_MODEL = "small.en"
 DEVICE = "cpu"
 COMPUTE_TYPE = "int8"
 
+
 class AsrEngine:
-    def __init__(self,
-                 model: str = DEFAULT_MODEL,
-                 device: str = DEVICE,
-                 compute_type: str = COMPUTE_TYPE):
+    """ASR engine using Whisper model."""
+    def __init__(
+        self,
+        model: str = DEFAULT_MODEL,
+        device: str = DEVICE,
+        compute_type: str = COMPUTE_TYPE,
+    ):
         self._model = WhisperModel(
             model, device=device, compute_type=compute_type)
 
     def recognize(self, audio_path: str):
+        """Transcribe audio file to text using Whisper model.
+
+        Args:
+            audio_path: Path to the audio file to transcribe
+
+        Returns:
+            List of segment dictionaries with transcription results
+        """
         segments, info = self._model.transcribe(audio_path, language="en", word_timestamps=False)
 
         result = []
