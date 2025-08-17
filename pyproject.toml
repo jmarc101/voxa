@@ -1,0 +1,11 @@
+[tool.flake8]
+# Core
+max-line-length = 100
+extend-ignore = ["E203", "W503"]   # play nice with Black (if you use it)
+max-complexity = 10
+exclude = [".git", "__pycache__", ".venv", "build", "dist"]
+
+# If you installed plugins above, you can keep defaults, or be explicit:
+# select = ["E", "F", "W", "B", "C4", "D"]  # pycodestyle/pyflakes/warnings/bugbear/comprehensions/docstrings
+# Per-file relaxations (example: don't require docstrings in tests)
+per-file-ignores = ["tests/*:D100,D101,D102,D103"]

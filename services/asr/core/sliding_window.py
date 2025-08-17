@@ -39,7 +39,6 @@ class AudioSlidingWindow:
     # Public config knobs
     window_size_ms: int
     sample_rate_hz: int
-    channels: int
     default_tail_ms: int
 
     # Derived / internal state
@@ -51,17 +50,14 @@ class AudioSlidingWindow:
         self,
         window_size_ms: int,
         sample_rate_hz: int = 16000,
-        channels: int = 1,
         default_tail_ms: int = 2000,
     ) -> None:
         assert window_size_ms > 0, "window_size_ms must be > 0"
         assert sample_rate_hz > 0, "sample_rate_hz must be > 0"
-        assert channels == 1, "Only mono is supported (channels=1)"
 
         self.window_size_ms = int(window_size_ms)
         self.sample_rate_hz = int(sample_rate_hz)
-        self.channels = int(channels)
-        self.default_tail_ms = int(default_tail_ms)
+        self.default_tail_ms = min(default_tail_ms, window_size_ms)
 
         # Max number of **mono** samples we keep at any time.
         # Example: 16_000 Hz * 3000 ms / 1000 = 48_000 samples (~96 KB @ int16)
@@ -104,7 +100,6 @@ class AudioSlidingWindow:
         self.buffer.extend(arr.tolist())  # push individual samples
         n = int(arr.size)
         self._total_samples += n
-        self._since_last_partial += n
         return n
 
     def _as_float(self, x: np.ndarray, as_float: bool) -> np.ndarray:
@@ -150,10 +145,6 @@ class AudioSlidingWindow:
         Typical use: after you emit a FINAL on FLUSH/END for an utterance.
         """
         self.buffer.clear()
-        # NOTE: we intentionally **do not** reset _total_samples here so you
-        # can still report "ever-seen" metrics. If you want per-utterance
-        # counters, snapshot and compute deltas outside, or add a reset.
-        self._since_last_partial = 0
 
     # ---------------------------------------------------------------------
     # Convenience metrics / cadence helpers
